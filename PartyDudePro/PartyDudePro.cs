@@ -42,7 +42,7 @@ using Zeta.Internals.SNO;
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 28th of October, 2012
-	Verion: 1.0.8.1
+	Verion: 1.0.8.2
 	
  */
 namespace PartyDudePro
@@ -131,7 +131,7 @@ namespace PartyDudePro
 
         public Version Version
         {
-            get { return new Version(1, 0, 8); }
+            get { return new Version(1, 0, 8, 2); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -362,7 +362,10 @@ namespace PartyDudePro
 				if (!isStashing())
 				{
 					// grab coordinates of leader from PathCoordinates file
-					string[] leaderPathCoords = dudeRadio.getPathCoordinates();
+					string[] leaderLocationDetails = dudeRadio.getPathCoordinates();
+					string leaderCurrentWorldID = leaderLocationDetails[0];
+					string leaderCurrentLevelAreaID = leaderLocationDetails[1];
+					string[] leaderPathCoords = leaderLocationDetails[2].Split('#');
 					// store leaderPathCoords as a Vector3 
 					leaderLastPosition = new Vector3(float.Parse(leaderPathCoords[0]), float.Parse(leaderPathCoords[1]), float.Parse(leaderPathCoords[2]));
 						

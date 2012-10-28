@@ -34,7 +34,7 @@ using Zeta.Internals.SNO;
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 28th of October, 2012
-	Verion: 1.0.8.1
+	Verion: 1.0.8.2
 	
  */
  
@@ -271,9 +271,6 @@ namespace PartyLeaderPro
 			
 		} // END OF createPartyState(int totalNumberOfPartyMembers)	
 		
-		
-		
-		
 		/*
 			this creates the files that represents for state of the party members (PartyDudePro)
 				Waiting (waiting for the PartyLeaderPro to start running)
@@ -321,11 +318,8 @@ namespace PartyLeaderPro
 				}
 				fs.Close();
 			}			
-		}
+		} // END OF createDudeState(int totalNumberOfPartyMembers)
 		
-		
-		
-	
 		/*
 			create the PartyMemberID database file/record
 			this file is used to identify the party members, and contains 
@@ -381,18 +375,18 @@ namespace PartyLeaderPro
 			update the PathCoordinates file with the leader's location in the world 
 			used by the members to locate the leader while on the run (following the leader)
 		 */
-		public void updatePathCoordinates(Vector3 leaderCoordinates)
+		public void updatePathCoordinates(string worldID, string levelAreaID, Vector3 leaderCoordinates)
 		{					
 			// Convert coordinates (Vector3) into floats, then strings, then separate them by commas
 			string coordinates = leaderCoordinates.X.ToString() + "#" + leaderCoordinates.Y.ToString() + "#" + leaderCoordinates.Z.ToString();
-					
+			string outputToFile = worldID + "=" + levelAreaID + "=" + coordinates;
 			// create file with desired contents
             FileStream fs = File.Open(pathCoordinates, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
 			// write the latest coordinates to the file
             using (StreamWriter pathCoordinatesWriter = new StreamWriter(fs))
             {
 				// write the leader's current world position to the file
-				pathCoordinatesWriter.WriteLine(coordinates);
+				pathCoordinatesWriter.WriteLine(outputToFile);
 			}
 			
 		//	pauseForABit(2, 3);

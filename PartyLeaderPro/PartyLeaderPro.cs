@@ -48,7 +48,7 @@ using Zeta.Internals.SNO;
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 28th of October, 2012
-	Verion: 1.0.8.1
+	Verion: 1.0.8.2
 	
  */
 namespace PartyLeaderPro
@@ -159,7 +159,7 @@ namespace PartyLeaderPro
 
         public Version Version
         {
-            get { return new Version(1, 0, 8); }
+            get { return new Version(1, 0, 8, 2); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -235,8 +235,9 @@ namespace PartyLeaderPro
 					{
 						// leave game to create a new one
 						Log("PROBLEM! Tried to start a new game, but the database is missing. We are now leaving and will recreate the game and party!");
-			//			ZetaDia.Service.Games.LeaveGame();
-						pauseForABit(3, 6);	
+						pauseForABit(3, 6);
+						ZetaDia.Service.Games.LeaveGame();
+						pauseForABit(2, 3);
 					}
 					else
 					{
@@ -269,11 +270,12 @@ namespace PartyLeaderPro
 					
 							// write coordinates to the PathCoordinates file after a certain amount of time (3 seconds)
 							// ========================================================================================
+							// we will actuall pass the world ID, Current Level Area ID, and the cooridinates of the leader to the followers
 							if (DateTime.Now.Subtract(LastPostionCheck).TotalMilliseconds > 1000)
 							{
 								LastPostionCheck = DateTime.Now;
 								// update coordinates
-								leaderRadio.updatePathCoordinates(ZetaDia.Me.Position);
+								leaderRadio.updatePathCoordinates(ZetaDia.CurrentWorldId.ToString(), ZetaDia.CurrentLevelAreaId.ToString(), ZetaDia.Me.Position);
 							}
 					
 							// Check if anyone is missing from the party
