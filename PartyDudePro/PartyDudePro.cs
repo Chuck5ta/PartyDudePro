@@ -42,7 +42,7 @@ using Zeta.Internals.SNO;
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 28th of October, 2012
-	Verion: 1.0.8.2
+	Verion: 1.0.8.3
 	
  */
 namespace PartyDudePro
@@ -86,6 +86,10 @@ namespace PartyDudePro
 		
 		// Boss encounter
 		private bool BossEncounter = false;
+		
+		// these store information of the leader's location
+		private int leaderWorldID = 0;
+		private int leaderLevelAreaID = 0;
 
 		// Config window variables/identifiers/objects
 		// -------------------------------------------
@@ -363,8 +367,8 @@ namespace PartyDudePro
 				{
 					// grab coordinates of leader from PathCoordinates file
 					string[] leaderLocationDetails = dudeRadio.getPathCoordinates();
-					string leaderCurrentWorldID = leaderLocationDetails[0];
-					string leaderCurrentLevelAreaID = leaderLocationDetails[1];
+					leaderWorldID = Convert.ToInt32(leaderLocationDetails[0]);
+					leaderLevelAreaID = Convert.ToInt32(leaderLocationDetails[1]);
 					string[] leaderPathCoords = leaderLocationDetails[2].Split('#');
 					// store leaderPathCoords as a Vector3 
 					leaderLastPosition = new Vector3(float.Parse(leaderPathCoords[0]), float.Parse(leaderPathCoords[1]), float.Parse(leaderPathCoords[2]));
@@ -519,10 +523,11 @@ namespace PartyDudePro
         {
 			// only check this is we are not in a Boss area
 			// checks that both the follower and the leader are not in the boss area
+			// make sure the leader is not too far away, or in a different world
 			currentGameState = dudeRadio.getGameState();
 			if (!BossEncounter && currentGameState != "BossEncounter")
 			{
-				if (ZetaDia.Me.Position.Distance(leaderLastPosition) > 150)
+				if (ZetaDia.Me.Position.Distance(leaderLastPosition) > 150 || ZetaDia.CurrentWorldId != leaderWorldID)
 				{
 					return true;
 				}
