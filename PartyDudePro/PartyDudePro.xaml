@@ -1,0 +1,25 @@
+<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Height="360" Width="430" Name="mainControl">
+    <Grid Height="350" Width="360">
+        <Label Content="Party Leader Pro / Party Dude Pro" Height="34" VerticalAlignment="Top" HorizontalAlignment="Left" Width="322" Margin="10,12,0,0" FontWeight="Bold" FontFamily="Comic Sans MS" FontSize="18" />
+    
+		<Rectangle Name="rectangle1" Height="132" HorizontalAlignment="Left" Margin="0,100,0,0" Stroke="Black" VerticalAlignment="Top" Width="343" Fill="#0D000000"></Rectangle>
+        <Label Name="label7" Content="COMMS SYSTEM" Height="28" HorizontalAlignment="Left" Margin="103,108,0,0" VerticalAlignment="Top" Width="129" FontFamily="Arial" FontSize="14" FontWeight="Bold" />
+        <Label Name="label5" Content="Enter database location path" HorizontalAlignment="Left" Margin="16,143,0,128" Width="173" IsEnabled="True" FontWeight="Bold" />
+        <Label Name="label6" Content="Enter database folder name" Height="28" HorizontalAlignment="Left" IsEnabled="True" Margin="23,184,0,0" VerticalAlignment="Top" Width="171" FontWeight="Bold" />
+        <Label Name="label8" Content="e.g. C:\Temp\" Height="28" HorizontalAlignment="Left" Margin="75,159,0,0" VerticalAlignment="Top" Width="200" />
+        <Label Name="label9" Content="e.g. CommsSystem" Height="28" HorizontalAlignment="Left" Margin="75,200,0,0" VerticalAlignment="Top" Width="200" />
+        <TextBox Name="txtCommsSystemFolderPath" Text="default" Height="23" HorizontalAlignment="Left" Margin="192,145,0,0"  VerticalAlignment="Top" Width="120" />
+        <TextBox Name="txtCommsSystemFolderName" Text="default" Height="23" HorizontalAlignment="Left" Margin="192,187,0,0" VerticalAlignment="Top" Width="120" />
+		
+        <Button Name="btnDone" Content="Done" Height="23" HorizontalAlignment="Left" Margin="127,260,0,0" VerticalAlignment="Top" Width="75" />
+	
+        <Label Name="lblMessage" Content="ERROR - Database does not exist!" Height="28" HorizontalAlignment="Left" Margin="65,295,0,0" VerticalAlignment="Top" IsEnabled="True" Visibility="Hidden" FontWeight="Bold" Foreground="#FFF21313" />
+   	
+   	
+	</Grid>
+</UserControl>

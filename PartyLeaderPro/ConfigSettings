@@ -1,0 +1,7 @@
+check2DudeParty=True
+check3DudeParty=False
+check4DudeParty=False
+enablePartyCheck=False
+checkOnPartyTimeGap=3
+commsFolderPath=C:\Temp\
+commsFolderName=Comms
