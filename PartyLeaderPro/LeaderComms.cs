@@ -29,12 +29,12 @@ using Zeta.Internals.SNO;
 /*
 	LeaderComms
 	
-	This deals with the communication between the PartyLeaderPro plugin and the plugin's comms database
+	This deals with the communication between the PartyLeaderPro plugin and the plugin's comms database	
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 25th of October, 2012
-	Verion: 1.0.8
+	Date: 28th of October, 2012
+	Verion: 1.0.8.1
 	
  */
  

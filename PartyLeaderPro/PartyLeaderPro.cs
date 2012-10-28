@@ -43,12 +43,12 @@ using Zeta.Internals.SNO;
 	Plugins that have been of use in the creation of this plugin:
 	- MyBuddy.Local aka Follow me Author: xsol
 	- GilesCombatReplacer Author: GilesSmith
-	- JoinMe! Author readonlyp	
+	- JoinMe! Author readonlyp		
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 25th of October, 2012
-	Verion: 1.0.8
+	Date: 28th of October, 2012
+	Verion: 1.0.8.1
 	
  */
 namespace PartyLeaderPro
@@ -415,7 +415,7 @@ namespace PartyLeaderPro
 						while (!inBossArea())
 						{
 							Log("We are transitioning to boss area");
-							pauseForABit(2, 3);
+							pauseForABit(3, 4);
 						}
 						Log("Time to kick some Boss butt!");
 					}
@@ -435,7 +435,7 @@ namespace PartyLeaderPro
 						while (!inBossArea())
 						{
 							Log("We are transitioning to boss area");
-							pauseForABit(2, 3);
+							pauseForABit(3, 4);
 						}
 						Log("Time to kick some Boss butt!");
 					}
@@ -674,8 +674,10 @@ namespace PartyLeaderPro
 				case 226713: // The Seigebreaker Assault Beast
 				case 119650: // Cydaea
 				case 121214: // Azmodan
-				case 103910: // Rakanoth
+				case 166640: // Rakanoth
+				case 103910: // Crystal Colonnade
 				case 214956: // Izual The Betrayer
+				case 205399: // Pinnacle of Heaven
 				case 109561: // Diablo
 				case 153670: // Shadow Realm
 					return true;
