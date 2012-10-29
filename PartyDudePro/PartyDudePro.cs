@@ -42,7 +42,7 @@ using Zeta.Internals.SNO;
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 28th of October, 2012
-	Verion: 1.0.8.3
+	Verion: 1.0.8.4
 	
  */
 namespace PartyDudePro
@@ -135,7 +135,7 @@ namespace PartyDudePro
 
         public Version Version
         {
-            get { return new Version(1, 0, 8, 2); }
+            get { return new Version(1, 0, 8, 4); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -145,6 +145,7 @@ namespace PartyDudePro
 		
         public void OnEnabled()
         {
+			Initialise_All();
 			// load settings from the config file
 			LoadConfigurationFile();
 			//create GameChanged instance
@@ -490,6 +491,7 @@ namespace PartyDudePro
         {
 			switch (ZetaDia.CurrentWorldId)
 			{
+				case 60713: //  Lerori's Passage
 				case 73261: //  Skeleton King
 				case 182976: // Spider Queen Aranea
 				case 78839: //  The Butcher
@@ -613,8 +615,11 @@ namespace PartyDudePro
 			when DB is first run
 		 */
         private void Initialise_All()
-        {
+        {		
 			// initialisation of variables goes here
+			
+			// Boss encounter
+			BossEncounter = false;
         } // END OF Initialise_All()
 		
 		/*

@@ -48,7 +48,7 @@ using Zeta.Internals.SNO;
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 28th of October, 2012
-	Verion: 1.0.8.3
+	Verion: 1.0.8.4
 	
  */
 namespace PartyLeaderPro
@@ -159,7 +159,7 @@ namespace PartyLeaderPro
 
         public Version Version
         {
-            get { return new Version(1, 0, 8, 2); }
+            get { return new Version(1, 0, 8, 4); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -488,6 +488,7 @@ namespace PartyLeaderPro
 			// Reload profile
 			Zeta.CommonBot.ProfileManager.Load(GlobalSettings.Instance.LastProfile);				
 			pauseForABit(1, 2);
+			Initialise_All();
 		}		
 		
 		/*
@@ -666,6 +667,7 @@ namespace PartyLeaderPro
         {
 			switch (ZetaDia.CurrentWorldId)
 			{
+				case 60713: //  Lerori's Passage
 				case 73261: //  Skeleton King
 				case 182976: // Spider Queen Aranea
 				case 78839: //  The Butcher
@@ -727,6 +729,9 @@ namespace PartyLeaderPro
             // set the game creation monitor to the current time
             // we will need to check 10 minutes from now, how many games were created
             gameCreationMonitorStartTime = DateTime.Now;
+		
+			// Boss encounter
+			BossEncounter = false;
 			
             Log("Initialsiation completed!");
         } // END OF Initialise_All()

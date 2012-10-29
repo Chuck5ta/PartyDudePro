@@ -28,12 +28,12 @@ using Zeta.Internals.Service;
 /*
 	PartyDudeComms
 	
-	This deals with the communication between the PartyDudePro plugin and the plugin's comms database	
+	This deals with the communication between the PartyDudePro plugin and the plugin's comms database
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 28th of October, 2012
-	Verion: 1.0.8.3
+	Verion: 1.0.8.4
 	
  */
  
