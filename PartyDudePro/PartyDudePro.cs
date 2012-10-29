@@ -35,14 +35,14 @@ using Zeta.Internals.SNO;
 	and use the leader's banner in order to rejoin the party	
 	
 	Plugins that have been of use in the creation of this plugin:
-	- MyBuddy.Local aka Follow me Author: xsol
-	- GilesCombatReplacer Author: GilesSmith
-	- JoinMe! Author readonlyp	
+	- MyBuddy.Local aka Follow me - Author: xsol
+	- GilesCombatReplacer - Author: GilesSmith
+	- JoinMe! - Author readonlyp	
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 28th of October, 2012
-	Verion: 1.0.8.4
+	Date: 29th of October, 2012
+	Verion: 1.0.9
 	
  */
 namespace PartyDudePro
@@ -135,7 +135,7 @@ namespace PartyDudePro
 
         public Version Version
         {
-            get { return new Version(1, 0, 8, 4); }
+            get { return new Version(1, 0, 9); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -525,9 +525,9 @@ namespace PartyDudePro
         {
 			// only check this is we are not in a Boss area
 			// checks that both the follower and the leader are not in the boss area
-			// make sure the leader is not too far away, or in a different world
+			// make sure the leader is not too far away, or in a different world, or that the follower is not dead
 			currentGameState = dudeRadio.getGameState();
-			if (!BossEncounter && currentGameState != "BossEncounter")
+			if (!BossEncounter && currentGameState != "BossEncounter" && !ZetaDia.Me.IsDead) // need to add && NOT DEAD
 			{
 				if (ZetaDia.Me.Position.Distance(leaderLastPosition) > 150 || ZetaDia.CurrentWorldId != leaderWorldID)
 				{
