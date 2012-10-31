@@ -34,7 +34,7 @@ using Zeta.Internals.SNO;
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 31st of October, 2012
-	Verion: 1.0.9.2
+	Verion: 1.0.9.3
 	
  */
  

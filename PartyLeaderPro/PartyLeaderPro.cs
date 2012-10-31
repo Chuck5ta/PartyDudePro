@@ -48,7 +48,7 @@ using Zeta.Internals.SNO;
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 31st of October, 2012
-	Verion: 1.0.9.2
+	Verion: 1.0.9.3
 	
  */
 namespace PartyLeaderPro
@@ -159,7 +159,7 @@ namespace PartyLeaderPro
 
         public Version Version
         {
-            get { return new Version(1, 0, 9, 2); }
+            get { return new Version(1, 0, 9, 3); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -472,18 +472,6 @@ namespace PartyLeaderPro
 		{			
 			// Upadate GameState to "Running"
 			leaderRadio.updateGameState("Running");
-				
-			try
-			{
-				if(!ZetaDia.Me.IsInTown)
-				{
-					ZetaDia.Me.UseTownPortal();
-					pauseForABit(2, 4);
-				}
-			}
-			catch
-			{
-			}
 			
 			// Reload profile
 			Zeta.CommonBot.ProfileManager.Load(GlobalSettings.Instance.LastProfile);				
