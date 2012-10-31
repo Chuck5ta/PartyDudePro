@@ -34,7 +34,7 @@ using Zeta.Internals.SNO;
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 31st of October, 2012
-	Verion: 1.0.9.1
+	Verion: 1.0.9.2
 	
  */
  
@@ -408,35 +408,54 @@ namespace PartyLeaderPro
 				createPartyState(totalNumberOfPartyMembers);
 				return false; // if file does not exist, then nobody can be in the party
 			}
-			
-			// Open the PartyState file to be read. Allow the party member to write to it
-            FileStream fs = File.Open(partyState, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using (StreamReader partyStateReader = new StreamReader(fs))
-            {		
-				// read in the state of Dude1 
-				string[] state = partyStateReader.ReadLine().Split('=');		
-				if (state[1] == "NotPresent")
-					return false; // someone is missing from the party
-					
-				if (totalNumberOfPartyMembers >= 3)
-				{
-					// read in the state of Dude2 
-					state = partyStateReader.ReadLine().Split('=');
+			try
+			{			
+				// Open the PartyState file to be read. Allow the party member to write to it
+				FileStream fs = File.Open(partyState, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+				using (StreamReader partyStateReader = new StreamReader(fs))
+				{		
+					// read in the state of Dude1 
+					string[] state = partyStateReader.ReadLine().Split('=');		
 					if (state[1] == "NotPresent")
+					{
+						// close the file, allowing others to take control of it
+						fs.Close();
 						return false; // someone is missing from the party
-				}
-				if (totalNumberOfPartyMembers == 4)
-				{
-					// read in the state of Dude3 
-					state = partyStateReader.ReadLine().Split('=');
-					if (state[1] == "NotPresent")
-						return false; // someone is missing from the party
-				}
+					}
 					
-			}	
-			// close the file, allowing others to take control of it
-            fs.Close();
-			// If we have reached this point, then we have a fullparty. Everybody has accepted the invite.
+					if (totalNumberOfPartyMembers >= 3)
+					{
+						// read in the state of Dude2 
+						state = partyStateReader.ReadLine().Split('=');
+						if (state[1] == "NotPresent")
+						{
+							// close the file, allowing others to take control of it
+							fs.Close();
+							return false; // someone is missing from the party
+						}
+					}
+					if (totalNumberOfPartyMembers == 4)
+					{
+						// read in the state of Dude3 
+						state = partyStateReader.ReadLine().Split('=');
+						if (state[1] == "NotPresent")
+						{
+							// close the file, allowing others to take control of it
+							fs.Close();
+							return false; // someone is missing from the party
+						}
+					}
+					
+				}
+				// All are present in the party - close the file, allowing others to take control of it
+				fs.Close();
+			}
+			catch
+			{
+				// probably unable to access the file because it is in use by a follower
+				return false; 
+			}
+			// If we have reached this point, then we have a full party. Everybody has accepted the invite.
 			return true; // everybody present and accounted for
 			
 		} // END OF allPresentInParty()

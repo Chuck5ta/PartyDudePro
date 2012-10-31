@@ -48,7 +48,7 @@ using Zeta.Internals.SNO;
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 31st of October, 2012
-	Verion: 1.0.9.1
+	Verion: 1.0.9.2
 	
  */
 namespace PartyLeaderPro
@@ -159,7 +159,7 @@ namespace PartyLeaderPro
 
         public Version Version
         {
-            get { return new Version(1, 0, 9, 1); }
+            get { return new Version(1, 0, 9, 2); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -560,20 +560,16 @@ namespace PartyLeaderPro
 				InGameButton.Click();
 			}
 			
-			// if Demonbuddy has been stopped, then we do not want it updating the database, saying that the party has been formed
-			// once the bot starts up again, we want the party formation to start again
-			if (Zeta.CommonBot.BotMain.IsRunning)
-			{			
-				Log("All invites have been accepted, now it's time to party!");
+			Log("All invites have been accepted, now it's time to party!");
 			
-				// pause for a bit
-				pauseForABit(1, 2);
+			// pause for a bit
+			pauseForABit(1, 2);
 
-				Log("Party up, let's go!");
+			Log("Party up, let's go!");
 			
-				// Update GameState to "Running", so that everybody starts the run
-				leaderRadio.updateGameState("Running");
-			}
+			// Update GameState to "Running", so that everybody starts the run
+			leaderRadio.updateGameState("Running");
+			
 		} // END OF createParty()
 		
 		/*

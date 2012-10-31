@@ -33,7 +33,7 @@ using Zeta.Internals.Service;
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
 	Date: 31st of October, 2012
-	Verion: 1.0.9.1
+	Verion: 1.0.9.2
 	
  */
  
