@@ -41,8 +41,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 29th of October, 2012
-	Verion: 1.0.9
+	Date: 31st of October, 2012
+	Verion: 1.0.9.1
 	
  */
 namespace PartyDudePro
@@ -135,7 +135,7 @@ namespace PartyDudePro
 
         public Version Version
         {
-            get { return new Version(1, 0, 9); }
+            get { return new Version(1, 0, 9, 1); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -202,7 +202,7 @@ namespace PartyDudePro
 					
 					// grab Dude's current state
 					// PartyID will be = Dude1, Dude2, or Dude3
-					string currentDudeState = dudeRadio.getDudeState();
+			//		string currentDudeState = dudeRadio.getDudeState();
 					// ready for when we add code that requires the Dude's state
 				}	
 			
@@ -491,11 +491,13 @@ namespace PartyDudePro
         {
 			switch (ZetaDia.CurrentWorldId)
 			{
+				case 174449: // Cain's House
 				case 60713: //  Lerori's Passage
 				case 73261: //  Skeleton King
 				case 182976: // Spider Queen Aranea
 				case 78839: //  The Butcher
 				case 195200: // Maghda
+				case 81715: //  Visit the prince
 				case 60193: //  Zoltun Kulle
 				case 60756: //  Belial
 				case 103209: // Ghom 
