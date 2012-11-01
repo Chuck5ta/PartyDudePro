@@ -47,8 +47,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 31st of October, 2012
-	Verion: 1.0.9.3
+	Date: 1st of November, 2012
+	Verion: 1.0.10
 	
  */
 namespace PartyLeaderPro
@@ -110,8 +110,8 @@ namespace PartyLeaderPro
         private CheckBox checkParty;
 		private ComboBox cmbCheckOnPartyTimeGap;
 		private TextBox txtCommsSystemFolderPath, txtCommsSystemFolderName;
-		private Label lblDuration, lblComboBoxInfo1, lblComboBoxInfo2, lblComboBoxInfo3, lblMessage;
-		private Button btnDone, btnCheckPartyIntegrity;
+		private Label lblComboBoxInfo1, lblComboBoxInfo2, lblComboBoxInfo3, lblMessage;
+		private Button btnDone, btnCheckPartyIntegrity, btnLeaderControl;
 		// The config window object
         private Window configWindow;
 		// this holds the location of the config window's XAML file
@@ -122,6 +122,9 @@ namespace PartyLeaderPro
 		
 		// Comms 
 		private LeaderComms leaderRadio = new LeaderComms();
+		
+		// this states how the leader of the party if controlled. Either by the bot or by a human
+		private bool leaderControlledByBot = true;
 		
 		// Boss encounter
 		private bool BossEncounter = false;
@@ -159,7 +162,7 @@ namespace PartyLeaderPro
 
         public Version Version
         {
-            get { return new Version(1, 0, 9, 3); }
+            get { return new Version(1, 0, 10); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -766,6 +769,9 @@ namespace PartyLeaderPro
 				// read in the fifth line
 				config = configReader.ReadLine().Split('=');
 				checkOnPartyTimeGap = Convert.ToInt32(config[1]);
+				// read in the sixth line
+				config = configReader.ReadLine().Split('=');
+				leaderControlledByBot = Convert.ToBoolean(config[1]);
 				
 				// COMMS system
 				config = configReader.ReadLine().Split('=');
@@ -794,6 +800,8 @@ namespace PartyLeaderPro
                 configWriter.WriteLine("enablePartyCheck=" + enablePartyCheck.ToString());
 				// duration between party checks
                 configWriter.WriteLine("checkOnPartyTimeGap=" + checkOnPartyTimeGap.ToString());
+				// Leader control system (Bot or Human)
+                configWriter.WriteLine("leaderControlledByBot=" + leaderControlledByBot.ToString());
 				// COMMS system
                 configWriter.WriteLine("commsFolderPath=" + commsFolderPath);
                 configWriter.WriteLine("commsFolderName=" + commsFolderName);
@@ -838,18 +846,18 @@ namespace PartyLeaderPro
                     check4DudeParty = LogicalTreeHelper.FindLogicalNode(xamlContent, "check4DudeParty") as RadioButton;
                     check4DudeParty.Checked += new RoutedEventHandler(check4DudeParty_Checked);
 					
-					// 2 BUTTONS - btnCheckPartyIntegrity, btnDone
+					// BUTTON - btnCheckPartyIntegrity
                     btnCheckPartyIntegrity = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnCheckPartyIntegrity") as Button;
                     btnCheckPartyIntegrity.Click += new RoutedEventHandler(btnCheckPartyIntegrity_Click);
 
 					// text/info below the Check Party Inegrity combo box
-                    lblDuration = LogicalTreeHelper.FindLogicalNode(xamlContent, "lblDuration") as Label;
                     lblComboBoxInfo1 = LogicalTreeHelper.FindLogicalNode(xamlContent, "lblComboBoxInfo1") as Label;
                     lblComboBoxInfo2 = LogicalTreeHelper.FindLogicalNode(xamlContent, "lblComboBoxInfo2") as Label;
                     lblComboBoxInfo3 = LogicalTreeHelper.FindLogicalNode(xamlContent, "lblComboBoxInfo3") as Label;
-
-                    btnDone = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnDone") as Button;
-                    btnDone.Click += new RoutedEventHandler(btnDone_Click);
+					
+					// BUTTON - Leader control				
+                    btnLeaderControl = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnLeaderControl") as Button;
+                    btnLeaderControl.Click += new RoutedEventHandler(btnLeaderControl_Click);
 					
 					// displays an error message if the database path does not exist
                     lblMessage = LogicalTreeHelper.FindLogicalNode(xamlContent, "lblMessage") as Label;
@@ -863,9 +871,11 @@ namespace PartyLeaderPro
                     txtCommsSystemFolderPath.TextChanged += txtCommsSystemFolderPath_TextChanged;					
 					
                     txtCommsSystemFolderName = LogicalTreeHelper.FindLogicalNode(xamlContent, "txtCommsSystemFolderName") as TextBox;
-                    txtCommsSystemFolderName.TextChanged += txtCommsSystemFolderName_TextChanged;
+                    txtCommsSystemFolderName.TextChanged += txtCommsSystemFolderName_TextChanged;;
 					
-					
+					// Exit and save button
+                    btnDone = LogicalTreeHelper.FindLogicalNode(xamlContent, "btnDone") as Button;
+                    btnDone.Click += new RoutedEventHandler(btnDone_Click);
 					
                     UserControl mainControl = LogicalTreeHelper.FindLogicalNode(xamlContent, "mainControl") as UserControl;
                     // Set height and width to main window
@@ -917,6 +927,15 @@ namespace PartyLeaderPro
 			{
 				btnCheckPartyIntegrity.Content = "NO";
 				displayCheckOnPartyTimeGapComboBox(false);
+			}
+			// Leader controlled by Bit or Human
+			if (leaderControlledByBot == true)
+			{
+				btnLeaderControl.Content = "Bot Controlled";
+			}
+			else
+			{
+				btnLeaderControl.Content = "Human Controlled";
 			}
 			// COMMS system database
 			txtCommsSystemFolderPath.Text = commsFolderPath;
@@ -986,8 +1005,6 @@ namespace PartyLeaderPro
 				// make the cmbCheckOnPartyTimeGap comboBox visible
 				cmbCheckOnPartyTimeGap.Visibility = System.Windows.Visibility.Visible;
 				// make the info text below the comboBox visible
-				lblDuration.Visibility = System.Windows.Visibility.Visible;
-				// make the info text below the comboBox visible
 				lblComboBoxInfo1.Visibility = System.Windows.Visibility.Visible;
 				// make the info text below the comboBox visible
 				lblComboBoxInfo2.Visibility = System.Windows.Visibility.Visible;
@@ -998,8 +1015,6 @@ namespace PartyLeaderPro
 			{
 				// make the cmbCheckOnPartyTimeGap comboBox invisible
 				cmbCheckOnPartyTimeGap.Visibility = System.Windows.Visibility.Hidden;
-				// make the info text below the comboBox invisible
-				lblDuration.Visibility = System.Windows.Visibility.Hidden;
 				// make the info text below the comboBox invisible
 				lblComboBoxInfo1.Visibility = System.Windows.Visibility.Hidden;
 				// make the info text below the comboBox invisible
@@ -1018,63 +1033,48 @@ namespace PartyLeaderPro
 			{
 				case 0:
 					checkOnPartyTimeGap = 1;
-					lblDuration.Content = "1"; 
 					break;
 				case 1:
 					checkOnPartyTimeGap = 2;
-					lblDuration.Content = "2"; 
 					break;
 				case 2:
 					checkOnPartyTimeGap = 3;
-					lblDuration.Content = "3"; 
 					break;
 				case 3:
 					checkOnPartyTimeGap = 4;
-					lblDuration.Content = "4"; 
 					break;
 				case 4:
-					checkOnPartyTimeGap = 5;
-					lblDuration.Content = "5"; 
+					checkOnPartyTimeGap = 5; 
 					break;
 				case 5:
 					checkOnPartyTimeGap = 6;
-					lblDuration.Content = "6"; 
 					break;
 				case 6:
-					checkOnPartyTimeGap = 7;
-					lblDuration.Content = "7"; 
+					checkOnPartyTimeGap = 7; 
 					break;
 				case 7:
 					checkOnPartyTimeGap = 8;
-					lblDuration.Content = "8"; 
 					break;
 				case 8:
 					checkOnPartyTimeGap = 9;
-					lblDuration.Content = "9"; 
 					break;
 				case 9:
 					checkOnPartyTimeGap = 10;
-					lblDuration.Content = "10"; 
 					break;
 				case 10:
 					checkOnPartyTimeGap = 11;
-					lblDuration.Content = "11"; 
 					break;
 				case 11:
 					checkOnPartyTimeGap = 12;
-					lblDuration.Content = "12"; 
 					break;
 				case 12:
-					checkOnPartyTimeGap = 13;
-					lblDuration.Content = "13"; 
+					checkOnPartyTimeGap = 13; 
 					break;
 				case 13:
 					checkOnPartyTimeGap = 14;
-					lblDuration.Content = "14"; 
 					break;
 				default:
 					checkOnPartyTimeGap = 15;
-					lblDuration.Content = "15"; 
 					break;
 			}
 				
@@ -1101,6 +1101,24 @@ namespace PartyLeaderPro
         {
 			// store contents 
 			commsFolderName = txtCommsSystemFolderName.Text;
+		}
+		
+		/*
+			This method represents the btnLeaderControl button click event
+			It sets how the leader of the party will be controlled. Either by the bot or by a human
+		 */		
+        private void btnLeaderControl_Click(object sender, RoutedEventArgs e)
+        {
+			if (leaderControlledByBot)
+			{
+				btnLeaderControl.Content = "Human Controlled";
+				leaderControlledByBot = false;
+			}
+			else
+			{
+				btnLeaderControl.Content = "Bot Controlled";
+				leaderControlledByBot = true;	
+			}
 		}
 		
 		/*
