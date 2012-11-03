@@ -1,6 +1,6 @@
 check2DudeParty=False
-check3DudeParty=False
-check4DudeParty=True
+check3DudeParty=True
+check4DudeParty=False
 enablePartyCheck=False
 checkOnPartyTimeGap=3
 leaderControlledByBot=True

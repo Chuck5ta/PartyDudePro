@@ -47,8 +47,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 1st of November, 2012
-	Verion: 1.0.10
+	Date: 3rd of November, 2012
+	Verion: 2.0.0
 	
  */
 namespace PartyLeaderPro
@@ -162,7 +162,7 @@ namespace PartyLeaderPro
 
         public Version Version
         {
-            get { return new Version(1, 0, 10); }
+            get { return new Version(2, 0, 0); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -757,12 +757,21 @@ namespace PartyLeaderPro
 				// read in the first line
 				string[] config = configReader.ReadLine().Split('=');
 				check2DudePartySetting = Convert.ToBoolean(config[1]);
+				// set the total number of required party members
+				if (check2DudePartySetting)
+					totalNumberOfPartyMembers = 2;
 				// read in the second line
 				config = configReader.ReadLine().Split('=');
 				check3DudePartySetting = Convert.ToBoolean(config[1]);
+				// set the total number of required party members
+				if (check3DudePartySetting)
+					totalNumberOfPartyMembers = 3;
 				// read in the third line
 				config = configReader.ReadLine().Split('=');
 				check4DudePartySetting = Convert.ToBoolean(config[1]);
+				// set the total number of required party members
+				if (check4DudePartySetting)
+					totalNumberOfPartyMembers = 4;
 				// read in the fourth line
 				config = configReader.ReadLine().Split('=');
 				enablePartyCheck = Convert.ToBoolean(config[1]);

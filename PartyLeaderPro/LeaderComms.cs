@@ -33,8 +33,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 1st of November, 2012
-	Verion: 1.0.10
+	Date: 3rd of November, 2012
+	Verion: 2.0.0
 	
  */
  

@@ -41,8 +41,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 1st of November, 2012
-	Verion: 1.0.10
+	Date: 3rd of November, 2012
+	Verion: 2.0.0
 	
  */
 namespace PartyDudePro
@@ -135,7 +135,7 @@ namespace PartyDudePro
 
         public Version Version
         {
-            get { return new Version(1, 0, 10); }
+            get { return new Version(2, 0, 0); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -210,8 +210,22 @@ namespace PartyDudePro
 					// PartyID will be = Dude1, Dude2, or Dude3
 			//		string currentDudeState = dudeRadio.getDudeState();
 					// ready for when we add code that requires the Dude's state
-				}	
-			
+				}
+
+				// OK BUTTON
+				// this pops up for a number of reasons:
+				// - Portal Stone use
+				if (Zeta.Internals.UIElement.IsValidElement(0x891D21408238D18E) && (Button = Zeta.Internals.UIElement.FromHash(0x891D21408238D18E)) != null)
+				{
+					if (Button.IsVisible)
+					{
+						Log("Clicking on OK button");
+						// click on the ACCEPT button
+						Button.Click();
+						pauseForABit(2, 3);
+					}
+				}
+				
 				// Boss Encounter
 				// This clicks on the ACCEPT button of the boss encounter
 				// found to be the same hash for all bosses 
@@ -401,6 +415,11 @@ namespace PartyDudePro
 					// store leaderPathCoords as a Vector3 
 					leaderLastPosition = new Vector3(float.Parse(leaderPathCoords[0]), float.Parse(leaderPathCoords[1]), float.Parse(leaderPathCoords[2]));
 						
+					// this checks to see if the leader's level area is different to the follower's
+					// if it is, it will check to see if there is a portal nearby, and if so use it
+					// then it can move of to the following code to check on out of range
+					leaderLevelAreaChangeCheck(leaderLevelAreaID);
+						
 					// now we need to make sure the leader hasn't gotten too far away
 					// if the leader is too far away, we will need to TP back to town and use the banner to
 					// rejoin the main party
@@ -437,7 +456,59 @@ namespace PartyDudePro
 					}
 				}
 			}
-		} // END OF onTheRun()		
+		} // END OF onTheRun()	
+	
+		
+        /*
+            This method checks to see if the leader is in a different Level Area than the follower.
+			If it is, then we need to see if there is a portal nearby, and if so use it.
+         */
+        private void leaderLevelAreaChangeCheck(int levelAreaID)
+        {
+			// check if the leader's Level Area ID is different to the follower's
+			if (ZetaDia.CurrentLevelAreaId != levelAreaID && !BossEncounter)
+			{
+				// Is there a portal nearby
+				// if so, locate portal and use it				
+				
+				foreach (Actor worldActor in ZetaDia.Actors.RActorList)
+				{
+					// in order to be able to use the object's data we need to convert it to a DiaObject
+					DiaObject worldObject = (DiaObject)worldActor;
+
+					// is the object a portal, within 10 feet and NOT a BossPortal ?
+					if(worldObject is Zeta.Internals.Actors.Gizmos.GizmoPortal && worldObject.Distance < 11)
+					{
+						Log("There is  portal nearby!");
+						ZetaDia.Me.UsePower(SNOPower.Walk, worldObject.Position, ZetaDia.Me.WorldDynamicId, -1);
+						BotMain.PauseFor(System.TimeSpan.FromSeconds(randomNumber.Next(2, 3)));
+						Log("Current coords: " + worldObject.Position.ToString());
+						Log("My position coords: " + ZetaDia.Me.Position.ToString());
+						// store the followers current coordinates
+						Vector3 prePortalCoordinates = ZetaDia.Me.Position;
+						// get me through that portal
+						// repeat until our world position has changed
+						while(prePortalCoordinates.Distance(ZetaDia.Me.Position) < 5)
+						{
+							Log("Use dat portal, mon");
+							ZetaDia.Me.UsePower(SNOPower.Axe_Operate_Gizmo, worldObject.Position, ZetaDia.Me.WorldDynamicId, worldObject.ACDGuid);
+							// pause bot for a bit
+							BotMain.PauseFor(System.TimeSpan.FromSeconds(randomNumber.Next(1, 2)));
+						}
+						// Set this follower's DudeState file to Running, so that the leader knows that 
+						// all the followers are through the portal and ready to continue the run again
+						dudeRadio.updateDudeState("Running");
+						pauseForABit(1,2);
+						break;
+					}
+				}
+				
+				// No portal
+				// nothing more to check on, we may be out of range, so let that code deal with that possibility
+				
+			}
+		}
+		
 		
         /*
             This method checks to see if we are in combat
@@ -594,6 +665,8 @@ namespace PartyDudePro
 			
 				// update the dude's state to ensure that it is running with the party
 				dudeRadio.updateDudeState("Running");
+				Log("I'm off to use the leader banner!");
+				Log("====================================");
 				// locate and use the leader's banner
 				IEnumerator<Actor> ied = ZetaDia.Actors.ACDList.GetEnumerator();
 				while (ied.MoveNext())
