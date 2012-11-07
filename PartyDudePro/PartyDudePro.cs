@@ -41,8 +41,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 3rd of November, 2012
-	Verion: 2.0.0
+	Date: 7th of November, 2012
+	Verion: 2.0.1
 	
  */
 namespace PartyDudePro
@@ -212,17 +212,25 @@ namespace PartyDudePro
 					// ready for when we add code that requires the Dude's state
 				}
 
-				// OK BUTTON
+				// Portal stone OK button
 				// this pops up for a number of reasons:
 				// - Portal Stone use
 				if (Zeta.Internals.UIElement.IsValidElement(0x891D21408238D18E) && (Button = Zeta.Internals.UIElement.FromHash(0x891D21408238D18E)) != null)
 				{
 					if (Button.IsVisible)
 					{
+						// grab world ID
+						int previousWorldID = ZetaDia.CurrentWorldId;
 						Log("Clicking on OK button");
 						// click on the ACCEPT button
 						Button.Click();
 						pauseForABit(2, 3);
+						// wait till we get to the destination
+						while(ZetaDia.CurrentWorldId == previousWorldID)
+						{
+							// do nothing
+							Log("we are transitioning out of this world, via the portal stone");
+						}
 					}
 				}
 				
@@ -494,6 +502,28 @@ namespace PartyDudePro
 							ZetaDia.Me.UsePower(SNOPower.Axe_Operate_Gizmo, worldObject.Position, ZetaDia.Me.WorldDynamicId, worldObject.ACDGuid);
 							// pause bot for a bit
 							BotMain.PauseFor(System.TimeSpan.FromSeconds(randomNumber.Next(1, 2)));
+							
+							// Portal stone OK button
+							// this pops up for a number of reasons:
+							// - Portal Stone use
+							if (Zeta.Internals.UIElement.IsValidElement(0x891D21408238D18E) && (Button = Zeta.Internals.UIElement.FromHash(0x891D21408238D18E)) != null)
+							{
+								if (Button.IsVisible)
+								{
+									// grab world ID
+									int previousWorldID = ZetaDia.CurrentWorldId;
+									Log("Clicking on OK button");
+									// click on the ACCEPT button
+									Button.Click();
+									pauseForABit(2, 3);
+									// wait till we get to the destination
+									while(ZetaDia.CurrentWorldId == previousWorldID)
+									{
+										// do nothing
+										Log("we are transitioning out of this world, via the portal stone");
+									}
+								}
+							}
 						}
 						// Set this follower's DudeState file to Running, so that the leader knows that 
 						// all the followers are through the portal and ready to continue the run again
@@ -596,6 +626,7 @@ namespace PartyDudePro
 				case 78839: //  The Butcher
 				case 195200: // Maghda
 				case 81715: //  Visit the prince
+				case 58493: //  Adria - The Wrecthed Pit
 				case 60193: //  Zoltun Kulle
 				case 60756: //  Belial
 				case 103209: // Ghom 

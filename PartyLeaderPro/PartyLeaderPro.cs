@@ -47,8 +47,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 3rd of November, 2012
-	Verion: 2.0.0
+	Date: 7th of November, 2012
+	Verion: 2.0.1
 	
  */
 namespace PartyLeaderPro
@@ -661,6 +661,7 @@ namespace PartyLeaderPro
 				case 78839: //  The Butcher
 				case 195200: // Maghda
 				case 81715: //  Visit the prince
+				case 58493: //  Adria - The Wrecthed Pit			
 				case 60193: //  Zoltun Kulle
 				case 60756: //  Belial
 				case 103209: // Ghom 
