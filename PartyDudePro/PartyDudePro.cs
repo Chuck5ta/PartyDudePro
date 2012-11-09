@@ -41,8 +41,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 7th of November, 2012
-	Verion: 2.0.1
+	Date: 9th of November, 2012
+	Verion: 2.0.2
 	
  */
 namespace PartyDudePro
@@ -135,7 +135,7 @@ namespace PartyDudePro
 
         public Version Version
         {
-            get { return new Version(2, 0, 1); }
+            get { return new Version(2, 0, 2); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -484,8 +484,8 @@ namespace PartyDudePro
 					// in order to be able to use the object's data we need to convert it to a DiaObject
 					DiaObject worldObject = (DiaObject)worldActor;
 
-					// is the object a portal, within 10 feet and NOT a BossPortal ?
-					if(worldObject is Zeta.Internals.Actors.Gizmos.GizmoPortal && worldObject.Distance < 11)
+					// is the object a portal, within 30 feet and NOT a BossPortal ?
+					if(worldObject is Zeta.Internals.Actors.Gizmos.GizmoPortal && worldObject.Distance < 50)
 					{
 						Log("There is  portal nearby!");
 						ZetaDia.Me.UsePower(SNOPower.Walk, worldObject.Position, ZetaDia.Me.WorldDynamicId, -1);

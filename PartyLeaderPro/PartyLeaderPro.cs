@@ -47,8 +47,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al
-	Date: 7th of November, 2012
-	Verion: 2.0.1
+	Date: 9th of November, 2012
+	Verion: 2.0.2
 	
  */
 namespace PartyLeaderPro
@@ -162,7 +162,7 @@ namespace PartyLeaderPro
 
         public Version Version
         {
-            get { return new Version(2, 0, 1); }
+            get { return new Version(2, 0, 2); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -691,9 +691,13 @@ namespace PartyLeaderPro
 			// TOTAL REWORKING OF THIS SHIT
 			
 			// update PartyState to show that the Leader just died
-			// code within OnPulse() should fire now, and deal with what is 
+			// if this leader s controlled by the bot then the code 
+			// within OnPulse() should fire now, and deal with what is 
 			// required when the leader dies
-			leaderRadio.updateGameState("Dead");
+			// Humna control of the leader does not need to have the 
+			// leader head back to town
+			if (leaderControlledByBot)
+				leaderRadio.updateGameState("Dead");
 			
 		} // END OF OnPlayerDied(object sender, EventArgs e)	
 		
@@ -779,7 +783,7 @@ namespace PartyLeaderPro
 				// read in the fifth line
 				config = configReader.ReadLine().Split('=');
 				checkOnPartyTimeGap = Convert.ToInt32(config[1]);
-				// read in the sixth line
+				// read in the sixth line - leader controlled by bot or human
 				config = configReader.ReadLine().Split('=');
 				leaderControlledByBot = Convert.ToBoolean(config[1]);
 				
