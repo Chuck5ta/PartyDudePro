@@ -36,13 +36,13 @@ using Zeta.Internals.SNO;
 	
 	Plugins that have been of use in the creation of this plugin:
 	- MyBuddy.Local aka Follow me - Author: xsol
-	- GilesCombatReplacer - Author: GilesSmith
+	- GilesCombatReplacer and Trinity - Author: GilesSmith
 	- JoinMe! - Author readonlyp	
 	
 	Author: ChuckyEgg (CIGGARC Developer)
-	Support: CIGGARC team, et al
-	Date: 9th of November, 2012
-	Verion: 2.0.2
+	Support: CIGGARC team, et al, especially Tesslarc ;)
+	Date: 11th of November, 2012
+	Verion: 2.0.3
 	
  */
 namespace PartyDudePro
@@ -135,7 +135,7 @@ namespace PartyDudePro
 
         public Version Version
         {
-            get { return new Version(2, 0, 2); }
+            get { return new Version(2, 0, 3); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -199,7 +199,18 @@ namespace PartyDudePro
 				
 				// are we creating the party - start of a game
 				if (currentGameState == "CreateParty")
+				{
+					// TP back to town
+					while(!ZetaDia.Me.IsInTown)
+					{
+						// make sure there aren't any baddies about!
+						Zeta.CommonBot.CombatTargeting.Instance.Pulse();
+						// To town, baby!
+						ZetaDia.Me.UseTownPortal();
+						pauseForABit(1, 2);
+					}
 					checkForPartyInvite();
+				}
 				else
 				{
 					// Are we on the run
@@ -248,12 +259,24 @@ namespace PartyDudePro
 						// set the boss encounter to true, so that we don't test for out of Range of the Leader
 						BossEncounter = true;
 						// Allow time to enter boss area
-						while (!inBossArea())
+						// check that leader has not left game and forming a new party
+						while (!inBossArea() && currentGameState != "CreateParty")
 						{
+							// get the current GameState
+							// just-in-case tyhe leader has left game to form a new game
+							currentGameState = dudeRadio.getGameState();
 							Log("We are transitioning to boss area");
 							pauseForABit(3, 4);
 						}
-						Log("Time to kick some Boss butt!");
+						// check if we exited transition to boss area because the leader is creating a new game and party
+						if (currentGameState == "CreateParty")
+						{			
+							// add Click CANCEL button
+							
+							BossEncounter = false;
+						}
+						else
+							Log("Time to kick some Boss butt!");
 					}
 				}
 				if (Zeta.Internals.UIElement.IsValidElement(0xF495983BA9BE450F) && (Button = Zeta.Internals.UIElement.FromHash(0xF495983BA9BE450F)) != null)
@@ -266,14 +289,61 @@ namespace PartyDudePro
 						// set the boss encounter to true, so that we don't test for out of Range of the Leader
 						BossEncounter = true;
 						// Allow time to enter boss area
-						while (!inBossArea())
+						// check that leader has not left game and forming a new party
+						while (!inBossArea() && currentGameState != "CreateParty")
 						{
+							// get the current GameState
+							// just-in-case tyhe leader has left game to form a new game
+							currentGameState = dudeRadio.getGameState();
 							Log("We are transitioning to boss area");
 							pauseForABit(3, 4);
 						}
-						Log("Time to kick some Boss butt!");
+						// check if we exited transition to boss area because the leader is creating a new game and party
+						if (currentGameState == "CreateParty")
+						{			
+							// add Click CANCEL button
+							
+							BossEncounter = false;
+						}
+						else
+							Log("Time to kick some Boss butt!");
+					}
+				}	
+
+				// Follower leaving message
+				// need to OKAY this in order to get rid of it
+				if (Zeta.Internals.UIElement.IsValidElement(0xF85A00117F5902E9) && (Button = Zeta.Internals.UIElement.FromHash(0xF85A00117F5902E9)) != null)
+				{
+					if (Button.IsVisible)
+					{
+						Log("Follower is leaving message has popped up");
+						// click on the OK button
+						Button.Click();
 					}
 				}
+				// Follower is joining up again - if you are the only one in the party, then might as well have the follower rejoin
+				// need to OKAY this in order to get rid of it
+				if (Zeta.Internals.UIElement.IsValidElement(0x161745BBCE22A8BA) && (Button = Zeta.Internals.UIElement.FromHash(0x161745BBCE22A8BA)) != null)
+				{
+					if (Button.IsVisible)
+					{
+						Log("Follower is joining message has popped up");
+						// click on the YES button
+						Button.Click();
+					}
+				}
+				// Follower is joining up again - if you are the only one in the party, then might as well have the follower rejoin
+				// need to OKAY this in order to get rid of it
+				if (Zeta.Internals.UIElement.IsValidElement(0x161745BBCE22A8BA) && (Button = Zeta.Internals.UIElement.FromHash(0x161745BBCE22A8BA)) != null)
+				{
+					if (Button.IsVisible)
+					{
+						Log("Follower is joining message has popped up");
+						// click on the YES button
+						Button.Click();
+					}
+				}			
+				
 				Zeta.CommonBot.CombatTargeting.Instance.Pulse();
 			}
 			

@@ -1,8 +1,8 @@
-check2DudeParty=False
-check3DudeParty=True
+check2DudeParty=True
+check3DudeParty=False
 check4DudeParty=False
 enablePartyCheck=False
 checkOnPartyTimeGap=3
-leaderControlledByBot=True
+leaderControlledByBot=False
 commsFolderPath=C:\Temp\
 commsFolderName=Comms

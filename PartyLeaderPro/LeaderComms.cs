@@ -32,9 +32,9 @@ using Zeta.Internals.SNO;
 	This deals with the communication between the PartyLeaderPro plugin and the plugin's comms database	
 	
 	Author: ChuckyEgg (CIGGARC Developer)
-	Support: CIGGARC team, et al
-	Date: 9th of November, 2012
-	Verion: 2.0.2
+	Support: CIGGARC team, et al, especially Tesslarc ;)
+	Date: 11th of November, 2012
+	Verion: 2.0.3
 	
  */
  

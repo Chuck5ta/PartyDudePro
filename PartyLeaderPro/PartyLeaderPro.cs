@@ -46,9 +46,9 @@ using Zeta.Internals.SNO;
 	- JoinMe! - Author readonlyp		
 	
 	Author: ChuckyEgg (CIGGARC Developer)
-	Support: CIGGARC team, et al
-	Date: 9th of November, 2012
-	Verion: 2.0.2
+	Support: CIGGARC team, et al, especially Tesslarc ;)
+	Date: 11th of November, 2012
+	Verion: 2.0.3
 	
  */
 namespace PartyLeaderPro
@@ -162,7 +162,7 @@ namespace PartyLeaderPro
 
         public Version Version
         {
-            get { return new Version(2, 0, 2); }
+            get { return new Version(2, 0, 3); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -467,6 +467,18 @@ namespace PartyLeaderPro
 			leaderRadio.updateGameState("CreateParty");
         } // END OF GameChanged(object sender, EventArgs e)
 		
+        /*
+            This is executed whenever the current game is left/quit
+			This will allow the followers to act on the current state of the game, such
+			as to TP and leave game when the leader leaves game
+        */
+        public void GameLeft(object sender, EventArgs e)
+        {
+			Log("We are leaving the current game. Time to reset the GameState to CreateParty!");
+			// set game state back to form a new party
+			leaderRadio.updateGameState("CreateParty");
+		} // END OF GameLeft(object sender, EventArgs e)
+		
 		/*
 			This method represent the BotMain event OnStart (Zeta.CommonBot.BotMain.OnStart)
 			We need for the party formation to start again
@@ -700,12 +712,6 @@ namespace PartyLeaderPro
 				leaderRadio.updateGameState("Dead");
 			
 		} // END OF OnPlayerDied(object sender, EventArgs e)	
-		
-
-        public void GameLeft(object sender, EventArgs e)
-        {
-            Log("Leaving game!");
-        } // END OF GameLeft(object sender, EventArgs e)
 		
         /*
             This method initialises a number of variables to the starting values required when the char starts on a new run after a break or
