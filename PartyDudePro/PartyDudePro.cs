@@ -37,12 +37,12 @@ using Zeta.Internals.SNO;
 	Plugins that have been of use in the creation of this plugin:
 	- MyBuddy.Local aka Follow me - Author: xsol
 	- GilesCombatReplacer and Trinity - Author: GilesSmith
-	- JoinMe! - Author readonlyp	
+	- JoinMe! - Author readonlyp			
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al, especially Tesslarc ;)
-	Date: 11th of November, 2012
-	Verion: 2.0.3
+	Date: 14th of November, 2012
+	Verion: 2.0.4
 	
  */
 namespace PartyDudePro
@@ -86,6 +86,8 @@ namespace PartyDudePro
 		
 		// Boss encounter
 		private bool BossEncounter = false;
+		// area outside of the boss portal
+		private Vector3 AzmodanPortalLocation = new Vector3(float.Parse("151.3008"), float.Parse("716.5567"), float.Parse("-51.60944"));
 		
 		// these store information of the leader's location
 		private int leaderWorldID = 0;
@@ -135,7 +137,7 @@ namespace PartyDudePro
 
         public Version Version
         {
-            get { return new Version(2, 0, 3); }
+            get { return new Version(2, 0, 4); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -259,24 +261,11 @@ namespace PartyDudePro
 						// set the boss encounter to true, so that we don't test for out of Range of the Leader
 						BossEncounter = true;
 						// Allow time to enter boss area
-						// check that leader has not left game and forming a new party
-						while (!inBossArea() && currentGameState != "CreateParty")
+						while (!inBossArea())
 						{
-							// get the current GameState
-							// just-in-case tyhe leader has left game to form a new game
-							currentGameState = dudeRadio.getGameState();
 							Log("We are transitioning to boss area");
 							pauseForABit(3, 4);
 						}
-						// check if we exited transition to boss area because the leader is creating a new game and party
-						if (currentGameState == "CreateParty")
-						{			
-							// add Click CANCEL button
-							
-							BossEncounter = false;
-						}
-						else
-							Log("Time to kick some Boss butt!");
 					}
 				}
 				if (Zeta.Internals.UIElement.IsValidElement(0xF495983BA9BE450F) && (Button = Zeta.Internals.UIElement.FromHash(0xF495983BA9BE450F)) != null)
@@ -289,24 +278,11 @@ namespace PartyDudePro
 						// set the boss encounter to true, so that we don't test for out of Range of the Leader
 						BossEncounter = true;
 						// Allow time to enter boss area
-						// check that leader has not left game and forming a new party
-						while (!inBossArea() && currentGameState != "CreateParty")
+						while (!inBossArea())
 						{
-							// get the current GameState
-							// just-in-case tyhe leader has left game to form a new game
-							currentGameState = dudeRadio.getGameState();
 							Log("We are transitioning to boss area");
 							pauseForABit(3, 4);
 						}
-						// check if we exited transition to boss area because the leader is creating a new game and party
-						if (currentGameState == "CreateParty")
-						{			
-							// add Click CANCEL button
-							
-							BossEncounter = false;
-						}
-						else
-							Log("Time to kick some Boss butt!");
 					}
 				}	
 
@@ -342,8 +318,7 @@ namespace PartyDudePro
 						// click on the YES button
 						Button.Click();
 					}
-				}			
-				
+				}		
 				Zeta.CommonBot.CombatTargeting.Instance.Pulse();
 			}
 			
@@ -363,7 +338,6 @@ namespace PartyDudePro
 					pauseForABit(1, 2);
 				}
 			}
-			
 			
         } // END OF OnPulse()
 		
@@ -395,14 +369,14 @@ namespace PartyDudePro
 		 */
 		private void checkForPartyInvite()
 		{			
-			Log("We are in Party Creation mode");
+			Log("checkForPartyInvite() - We are in Party Creation mode");
             // Wait for invite
             if (Zeta.Internals.UIElement.IsValidElement(0x9EFA05648195042D) && (Button = Zeta.Internals.UIElement.FromHash(0x9EFA05648195042D)) != null)
             {
                 // is the invite graphic visible
                 if (Button.IsVisible)
                 {
-                    Log("Invite incoming!");
+                    Log("checkForPartyInvite() - Invite incoming!");
                     // invite has shown up, accept it
                     pauseForABit(1, 3);
                     Button.Click();
@@ -415,7 +389,7 @@ namespace PartyDudePro
                         {
                             // invite has shown up, accept it
                             pauseForABit(1, 3);
-                            Log("Accepting the invite to the party");
+                            Log("checkForPartyInvite() - Accepting the invite to the party");
                             // click ok
                             Button.Click();
 							// we are now in a party
@@ -540,11 +514,18 @@ namespace PartyDudePro
         /*
             This method checks to see if the leader is in a different Level Area than the follower.
 			If it is, then we need to see if there is a portal nearby, and if so use it.
+			-- do not use portal if we are near a boss portal or in a boss area
          */
         private void leaderLevelAreaChangeCheck(int levelAreaID)
         {
+			if (nearBossPortal())
+			{
+				Log("leaderLevelAreaChangeCheck() - WARNING! We are near a Boss portal!");
+			}
 			// check if the leader's Level Area ID is different to the follower's
-			if (ZetaDia.CurrentLevelAreaId != levelAreaID && !BossEncounter)
+			// We can't be fighting a boss or near a boss portal... if either of these are true, then it's best to 
+			// TP to town if it turns out that we have lost the leader
+			if (ZetaDia.CurrentLevelAreaId != levelAreaID && !BossEncounter && !nearBossPortal())
 			{
 				// Is there a portal nearby
 				// if so, locate portal and use it				
@@ -557,18 +538,16 @@ namespace PartyDudePro
 					// is the object a portal, within 30 feet and NOT a BossPortal ?
 					if(worldObject is Zeta.Internals.Actors.Gizmos.GizmoPortal && worldObject.Distance < 50)
 					{
-						Log("There is  portal nearby!");
+						Log("leaderLevelAreaChangeCheck() - There is  portal nearby!");
 						ZetaDia.Me.UsePower(SNOPower.Walk, worldObject.Position, ZetaDia.Me.WorldDynamicId, -1);
 						BotMain.PauseFor(System.TimeSpan.FromSeconds(randomNumber.Next(2, 3)));
-						Log("Current coords: " + worldObject.Position.ToString());
-						Log("My position coords: " + ZetaDia.Me.Position.ToString());
 						// store the followers current coordinates
 						Vector3 prePortalCoordinates = ZetaDia.Me.Position;
 						// get me through that portal
 						// repeat until our world position has changed
 						while(prePortalCoordinates.Distance(ZetaDia.Me.Position) < 5)
 						{
-							Log("Use dat portal, mon");
+							Log("leaderLevelAreaChangeCheck() - Use dat portal, mon");
 							ZetaDia.Me.UsePower(SNOPower.Axe_Operate_Gizmo, worldObject.Position, ZetaDia.Me.WorldDynamicId, worldObject.ACDGuid);
 							// pause bot for a bit
 							BotMain.PauseFor(System.TimeSpan.FromSeconds(randomNumber.Next(1, 2)));
@@ -590,7 +569,7 @@ namespace PartyDudePro
 									while(ZetaDia.CurrentWorldId == previousWorldID)
 									{
 										// do nothing
-										Log("we are transitioning out of this world, via the portal stone");
+										Log("leaderLevelAreaChangeCheck() - we are transitioning out of this world, via the portal stone");
 									}
 								}
 							}
@@ -607,7 +586,7 @@ namespace PartyDudePro
 				// nothing more to check on, we may be out of range, so let that code deal with that possibility
 				
 			}
-		}
+		} // END OF leaderLevelAreaChangeCheck(int levelAreaID)
 		
 		
         /*
@@ -715,6 +694,49 @@ namespace PartyDudePro
 			}
 			
         } // END OF inBossArea()
+		
+        /*
+            This method checks to see if we are just outside of a Boss area
+			It compares the follower's LevelAreaID with the LevelAreaID's of the Bosses
+         */
+        private int inBossPortalArea()
+        {
+			switch (ZetaDia.CurrentLevelAreaId)
+			{
+				case 119306: // Azmodan
+					return 119306;
+				default:
+					return 0;
+			}
+			
+        } // END OF inBossArea()
+		
+		/*
+            This method checks to see if we are just outside of a Boss area
+			It compares the follower's LevelAreaID with the LevelAreaID's of the Bosses
+         */
+		private bool nearBossPortal() 
+		{
+			int levelArea = inBossPortalArea();
+			// Are we in the same LevelArea as a Boss portal
+			if (levelArea != 0)
+			{
+				switch (levelArea)
+				{	
+					case 119306: // Azmodan
+						if (ZetaDia.Me.Position.Distance(AzmodanPortalLocation) < 100) // are we less than 100 from the portal?
+						{
+							Log("We are near Azmodan's portal!");
+							return true;
+						}
+						break;
+					default:
+						return false;
+				}
+			}
+			// we are not in the same Level Area as a boss portal
+			return false;
+		} // END OF nearBossPortal()
 		
 		
         /*
