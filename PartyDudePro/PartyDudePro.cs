@@ -41,8 +41,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al, especially Tesslarc ;)
-	Date: 14th of November, 2012
-	Verion: 2.0.4
+	Date: 15th of November, 2012
+	Verion: 2.0.5
 	
  */
 namespace PartyDudePro
@@ -84,14 +84,29 @@ namespace PartyDudePro
 		// this holds the X, Y, and Z coordinates of the leader's last known position
 		private Vector3 leaderLastPosition;
 		
-		// Boss encounter
-		private bool BossEncounter = false;
-		// area outside of the boss portal
-		private Vector3 AzmodanPortalLocation = new Vector3(float.Parse("151.3008"), float.Parse("716.5567"), float.Parse("-51.60944"));
-		
 		// these store information of the leader's location
 		private int leaderWorldID = 0;
 		private int leaderLevelAreaID = 0;
+		
+		// Boss encounter
+		private bool BossEncounter = false;
+		
+		// check on moving follower
+		// - used in portal usage and lost leader check
+		private Vector3 previousLocation;
+		private DateTime isMovingTimeCheck = DateTime.Now;		
+		
+		// Portal usage
+		private DateTime timeLastPortalWasUsed = DateTime.Now;
+		
+		// area outside of the boss portal
+		private Vector3 AzmodanPortalLocation = new Vector3(float.Parse("151.3008"), float.Parse("716.5567"), float.Parse("-51.60944"));
+		// New Tristram banner 
+		private Vector3 NewTristramLeaderBannerPosition = new Vector3(float.Parse("2965.15"), float.Parse("2834.933"), float.Parse("23.95")); 
+		// Hidden Camp banner 
+		private Vector3 HiddenCampLeaderBannerPosition = new Vector3(float.Parse("325.9613"), float.Parse("273.6971"), float.Parse("0"));
+		// Bastion's Keep banner 
+		private Vector3 BastionKeepLeaderBannerPosition = new Vector3(float.Parse("386.3227"), float.Parse("414.9005"), float.Parse("0.9196908"));
 
 		// Config window variables/identifiers/objects
 		// -------------------------------------------
@@ -103,6 +118,7 @@ namespace PartyDudePro
         private Window configWindow;
 		// this holds the location of the config window's XAML file
 		private string partyDudeXamlFile = @"Plugins\PartyDudePro\PartyDudePro.xaml";
+		
 		
 
         // DO NOT EDIT BELOW THIS LINE IF YOU DO NOT KNOW WHAT YOU ARE DOING
@@ -137,7 +153,7 @@ namespace PartyDudePro
 
         public Version Version
         {
-            get { return new Version(2, 0, 4); }
+            get { return new Version(2, 0, 5); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
@@ -451,6 +467,8 @@ namespace PartyDudePro
 		 */
 		private void onTheRun()
 		{		
+			//Log("We are on the run");
+			//Log("________________________");
 			Zeta.CommonBot.LootTargeting.Instance.Pulse();	
 			// only perform the grab coords and MoveTo every few seconds
 			// and when NOT in combat or looting
@@ -470,7 +488,7 @@ namespace PartyDudePro
 					// this checks to see if the leader's level area is different to the follower's
 					// if it is, it will check to see if there is a portal nearby, and if so use it
 					// then it can move of to the following code to check on out of range
-					leaderLevelAreaChangeCheck(leaderLevelAreaID);
+		//			leaderLevelAreaChangeCheck(leaderLevelAreaID);
 						
 					// now we need to make sure the leader hasn't gotten too far away
 					// if the leader is too far away, we will need to TP back to town and use the banner to
@@ -478,9 +496,53 @@ namespace PartyDudePro
 						
 					// only move if we are beyond a certain distance of the leader
 					//  WILL THIS WORK ???  ZetaDia.Me.Position.Distance ?????
-					if (!outOfRangeOfLeader())
+					
+					
+					// only check this to see if we are in a Boss area
+					// checks that both the follower and the leader are not in the boss area
+					currentGameState = dudeRadio.getGameState();
+			 		//Log("Can we move or not?");
+					double timeSinceLastPortalUsed = DateTime.Now.Subtract(timeLastPortalWasUsed).TotalMilliseconds;
+					if (timeSinceLastPortalUsed > 5000 && !followerIsMoving() && outOfRangeOfLeader()) // leader has taken a portal
 					{
-						// get the char to follow at a random distance (between 10 and 22)
+						timeLastPortalWasUsed = DateTime.Now; 
+						if (nearToTownCentre())
+							// go and use the banner
+							catchUpWithTheParty();
+						else
+							// seek out a portal
+							leaderLevelAreaChangeCheck(leaderLevelAreaID);
+					}
+					else if (timeSinceLastPortalUsed > 5000 && !followerIsMoving() && !outOfRangeOfLeader()) // e.g. New Tristram to Weeping Hollow
+					{
+						timeLastPortalWasUsed = DateTime.Now; 
+						if (nearToTownCentre())
+							// go and use the banner
+							catchUpWithTheParty();
+						else
+							// seek out a portal
+							leaderLevelAreaChangeCheck(leaderLevelAreaID);
+					}
+					else if (timeSinceLastPortalUsed > 5000 && followerIsMoving() && outOfRangeOfLeader()) // follower a long way from leader, as leader enters portal
+					{
+						timeLastPortalWasUsed = DateTime.Now; 
+						if (nearToTownCentre())
+							// go and use the banner
+							catchUpWithTheParty();
+						else
+							// seek out a portal
+							leaderLevelAreaChangeCheck(leaderLevelAreaID);
+					}
+					else if (outOfRangeOfLeader())
+					{
+						// go and use the banner
+						catchUpWithTheParty();
+					}
+					else
+					{
+						//Log("We are able to move");
+						//Log("~~~~~~~~~~~~~~~~~~~~~~~~~~");
+						// get the char to follow at a random distance (between 5 and 10)
 						int allowedDistance = randomNumber.Next(5, 10);
 						if (ZetaDia.Me.Position.Distance(leaderLastPosition) > allowedDistance)
 						{
@@ -490,26 +552,50 @@ namespace PartyDudePro
 						// will these allow for combat and looting
 						Zeta.CommonBot.CombatTargeting.Instance.Pulse();
 					}
-					else // we are too far away from leader, let's TP and banner
-					{
-					
-						// only check this is we are not in a Boss area
-						// checks that both the follower and the leader are not in the boss area
-						currentGameState = dudeRadio.getGameState();
-						// only TP out if we are safe to do so
-						//    and not grabbing some lovely loot ;)
-						if(!inCombat() && !isLooting() && !BossEncounter && currentGameState != "BossEncounter")
-						{
-							// TP back to base							
-							Log("I HAVE LOST THE LEADER!!!!");
-							// bugger, let's find them!
-							catchUpWithTheParty();
-						}
-					}
 				}
 			}
 		} // END OF onTheRun()	
 	
+		
+        /*
+            This method checks to see if the leader is in a different Level Area than the follower.
+			If it is, then we need to see if there is a portal nearby, and if so use it.
+			-- do not use portal if we are near a boss portal or in a boss area
+         */
+        private bool nearToTownCentre()
+        {
+			// New Tristram banner 
+			Vector3 NewTristramLeaderBannerPosition = new Vector3(float.Parse("2965.15"), float.Parse("2834.933"), float.Parse("23.95")); 
+			// Hidden Camp banner 
+			Vector3 HiddenCampLeaderBannerPosition = new Vector3(float.Parse("325.9613"), float.Parse("273.6971"), float.Parse("0"));
+			// Bastion's Keep banner 
+			Vector3 BastionKeepLeaderBannerPosition = new Vector3(float.Parse("386.3227"), float.Parse("414.9005"), float.Parse("0.9196908"));
+			// Which town are we in ?
+			switch (Zeta.ZetaDia.CurrentWorldId)
+			{
+				// New Tristram
+				case 71150:
+					Log("nearToTownCentre() - Ah ha, New Tristram");
+					if (ZetaDia.Me.Position.Distance(NewTristramLeaderBannerPosition) < 150)
+						return true;
+					else return false;
+				// Hidden Camp
+				case 161472:
+					Log("nearToTownCentre() - Ah ha, Hidden Camp");
+					if (ZetaDia.Me.Position.Distance(HiddenCampLeaderBannerPosition) < 150)
+						return true;
+					else return false;
+				// Bastion's Keep Stronghold
+				case 172909:
+					Log("nearToTownCentre() - Ah ha, Bastion's Keep Stronghold");
+					if (ZetaDia.Me.Position.Distance(BastionKeepLeaderBannerPosition) < 150)
+						return true;
+					else return false;
+				default:
+					Log("(PartyDudePro 691)Possible error - In Town, Lost Leader, Non TP area, BUT WE CANNOT ID THE TOWN!");
+					return false;
+			}
+		} // END OF nearToTownCentre()
 		
         /*
             This method checks to see if the leader is in a different Level Area than the follower.
@@ -522,6 +608,8 @@ namespace PartyDudePro
 			{
 				Log("leaderLevelAreaChangeCheck() - WARNING! We are near a Boss portal!");
 			}
+			// if we don't find a portal then we need to TP and banner
+			bool portalFound = false;
 			// check if the leader's Level Area ID is different to the follower's
 			// We can't be fighting a boss or near a boss portal... if either of these are true, then it's best to 
 			// TP to town if it turns out that we have lost the leader
@@ -534,12 +622,21 @@ namespace PartyDudePro
 				{
 					// in order to be able to use the object's data we need to convert it to a DiaObject
 					DiaObject worldObject = (DiaObject)worldActor;
+					
+					Log("leaderLevelAreaChangeCheck() - looking for a portal");
 
 					// is the object a portal, within 30 feet and NOT a BossPortal ?
 					if(worldObject is Zeta.Internals.Actors.Gizmos.GizmoPortal && worldObject.Distance < 50)
 					{
+						// portal found
+						portalFound = true;						
 						Log("leaderLevelAreaChangeCheck() - There is  portal nearby!");
-						ZetaDia.Me.UsePower(SNOPower.Walk, worldObject.Position, ZetaDia.Me.WorldDynamicId, -1);
+						// move to the portal		
+						Log("leaderLevelAreaChangeCheck() - Moving to the portal");
+						while (ZetaDia.Me.Position.Distance(worldObject.Position) > 10)
+						{
+							ZetaDia.Me.UsePower(SNOPower.Walk, worldObject.Position, ZetaDia.Me.WorldDynamicId, -1);
+						}
 						BotMain.PauseFor(System.TimeSpan.FromSeconds(randomNumber.Next(2, 3)));
 						// store the followers current coordinates
 						Vector3 prePortalCoordinates = ZetaDia.Me.Position;
@@ -576,8 +673,10 @@ namespace PartyDudePro
 						}
 						// Set this follower's DudeState file to Running, so that the leader knows that 
 						// all the followers are through the portal and ready to continue the run again
-						dudeRadio.updateDudeState("Running");
+			//			dudeRadio.updateDudeState("Running");
 						pauseForABit(1,2);
+						// set the time portal was last used to the current time
+						timeLastPortalWasUsed = DateTime.Now;
 						break;
 					}
 				}
@@ -585,6 +684,13 @@ namespace PartyDudePro
 				// No portal
 				// nothing more to check on, we may be out of range, so let that code deal with that possibility
 				
+			}
+			
+			if (!portalFound)
+			{
+				// no portal was found, so we need to head back to town
+				Log("No portal found, let's TP back to town and find the leader's banner");
+				catchUpWithTheParty();
 			}
 		} // END OF leaderLevelAreaChangeCheck(int levelAreaID)
 		
@@ -738,6 +844,32 @@ namespace PartyDudePro
 			return false;
 		} // END OF nearBossPortal()
 		
+        /*
+            This method checks to see if the follower is moving
+			- this is a good guard against getting stuck on a portal after the
+			leader goes through it.
+         */
+        private bool followerIsMoving()
+        {
+			if (DateTime.Now.Subtract(isMovingTimeCheck).TotalMilliseconds > 5000)
+			{
+				isMovingTimeCheck = DateTime.Now;
+				if (ZetaDia.Me.Position.Distance(previousLocation) > 10)
+				{
+					// store the current location, making it the previous postion
+					previousLocation = ZetaDia.Me.Position;
+					//Log("We are moving");
+					//Log("*****************");
+					return true;
+				}
+				//Log("Eek, we are NOT moving!");
+				//Log("========================");
+				return false;
+			}
+			else
+				return true;
+		} // END OF followerIsMoving()
+		
 		
         /*
             This method checks to see if we are a long way from the leader. 
@@ -785,11 +917,9 @@ namespace PartyDudePro
 			
 			if (ZetaDia.Me.IsInTown && outOfRangeOfLeader())
 			{
-			
 				// update the dude's state to ensure that it is running with the party
-				dudeRadio.updateDudeState("Running");
-				Log("I'm off to use the leader banner!");
-				Log("====================================");
+	//			dudeRadio.updateDudeState("Running");
+				Log("catchUpWithTheParty() - I'm off to use the leader banner!");
 				// locate and use the leader's banner
 				IEnumerator<Actor> ied = ZetaDia.Actors.ACDList.GetEnumerator();
 				while (ied.MoveNext())
@@ -828,11 +958,14 @@ namespace PartyDudePro
         {
             Log("New game!");
 			
+			// initialise any variables 
+			Initialise_All();
+			
 			LoadConfigurationFile();
 
 			// pause for a few seconds (3 to 6), while leader creates the party
-            Log("Wait for the leader to create a new game");
-			pauseForABit(3, 6);
+            Log("Waiting for the leader to create a new game");
+		//	pauseForABit(3, 6);
 		} // END OF GameChanged(object sender, EventArgs e)
 
 		/*
@@ -842,6 +975,11 @@ namespace PartyDudePro
         private void Initialise_All()
         {		
 			// initialisation of variables goes here
+			
+			// stored the character's location
+	//		previousLocation = ZetaDia.Me.Position;
+	
+			timeLastPortalWasUsed = DateTime.Now;
 			
 			// Boss encounter
 			BossEncounter = false;
