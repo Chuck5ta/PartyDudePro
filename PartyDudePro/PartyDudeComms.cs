@@ -32,8 +32,8 @@ using Zeta.Internals.Service;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al, especially Tesslarc ;)
-	Date: 15th of November, 2012
-	Verion: 2.0.5
+	Date: 16th of November, 2012
+	Verion: 2.0.6
 	
  */
  

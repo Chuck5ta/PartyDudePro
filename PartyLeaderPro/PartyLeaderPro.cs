@@ -474,6 +474,7 @@ namespace PartyLeaderPro
         */
         public void GameLeft(object sender, EventArgs e)
         {
+			ZetaDia.Service.Games.LeaveGame(false);
 			Log("We are leaving the current game. Time to reset the GameState to CreateParty!");
 			// set game state back to form a new party
 			leaderRadio.updateGameState("CreateParty");
