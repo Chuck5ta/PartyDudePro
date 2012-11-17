@@ -47,8 +47,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al, especially Tesslarc ;)
-	Date: 17th of November, 2012
-	Verion: 2.0.7
+	Date: 16th of November, 2012
+	Verion: 2.0.6
 	
  */
 namespace PartyLeaderPro
@@ -162,7 +162,7 @@ namespace PartyLeaderPro
 
         public Version Version
         {
-            get { return new Version(2, 0, 7); }
+            get { return new Version(2, 0, 5); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
