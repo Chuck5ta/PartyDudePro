@@ -32,8 +32,8 @@ using Zeta.Internals.Service;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al, especially Tesslarc ;)
-	Date: 16th of November, 2012
-	Verion: 2.0.6
+	Date: 17th of November, 2012
+	Verion: 2.0.7
 	
  */
  
@@ -75,6 +75,10 @@ namespace PartyDudePro
 		// this represents what is happening within the game, and specifically to the leader
 		// it can be set to CreateGame, Running, or Stashing
 		private string currentGameState = "CreateGame";
+		
+		// these are used in order to be able to set the file access fethods up with their own thread
+		private string globalGameState;
+		private string[] globalLeaderCoodinates;
 		
 		// this represents what is happening or happened to the Dude (party memeber)
 		// it can be set to Waiting, Running, Stashing, Dead, or Mayday
@@ -475,6 +479,16 @@ namespace PartyDudePro
 			// Dude is not set to Present, therefore not shown as being in the party
 			return false;
 		}
+		
+		// This is used to call the method that will do the actual work with its own thread
+		public string getGameState()
+		{
+			Thread getGameState = new Thread(() => { 
+				globalGameState = getTheGameState(); 
+			});
+			getGameState.Start();
+			return globalGameState;
+		}
 	
 		/*
 			this method retrieves the current GameState from the GameState file
@@ -482,7 +496,7 @@ namespace PartyDudePro
 			  Running - leader is exploring, the party members can follow
 			  Stashing - Leader is emptying bags, the members can wait (stand still/fight/loot)
 		 */
-		public string getGameState()
+		private string getTheGameState()
 		{
 			// does file exist?
 			// If not, then the leader if probably changing its contents
@@ -516,12 +530,23 @@ namespace PartyDudePro
 			return currentGameState;
 			
 		} // END OF getGameState()
+		
+		// This is used to call the method that will do the actual work with its own thread
+		// - used in conjunction with getPathCoordinates() method
+		public string[] getPathCoordinates()
+		{
+			Thread getPathCoordinates = new Thread(() => { 
+				globalLeaderCoodinates = getThePathCoordinates(); 
+			});
+			getPathCoordinates.Start();
+			return globalLeaderCoodinates;
+		}
 	
 		/*
 			this method retrieves the current coordinates the leader posted to the PathCoordinates file
 			this is only done if the file is accessible
 		 */
-		public string[] getPathCoordinates()
+		private string[] getThePathCoordinates()
 		{
 			string[] currentLocationDetails;
 			// I NEED TO CREATE A DEFAULT VALUE FOR THIS

@@ -33,8 +33,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al, especially Tesslarc ;)
-	Date: 16th of November, 2012
-	Verion: 2.0.6
+	Date: 17th of November, 2012
+	Verion: 2.0.7
 	
  */
  
@@ -67,6 +67,9 @@ namespace PartyLeaderPro
 		private string currentGameState = "CreateGame";
 		
 		private FileStream pathCoordinatesFS;
+		
+		// variable(s) used inorder to set allow the file access methods to be run in their own threads
+		private bool globalAllPresentInParty = false;
 	
 		/*
 			class constructor
@@ -163,8 +166,7 @@ namespace PartyLeaderPro
 			dude1State = commsDirectory + @"\Dude1State";
 			dude2State = commsDirectory + @"\Dude2State";
 			dude3State = commsDirectory + @"\Dude3State";		
-		}
-		
+		}	
 	
 		/*
 			this method updates the GameState
@@ -370,12 +372,20 @@ namespace PartyLeaderPro
 			pathCoordinatesFS.Close();
 			
 		} // END OF createPathCoordinates()
+		
+		// This is used to call the method that will do the actual work with its own thread
+		// - this is used in conjunction with the updateThePathCoordinates( ... ) method
+		public void updatePathCoordinates(string worldID, string levelAreaID, Vector3 leaderCoordinates)
+		{
+			Thread updatePathCoordinates = new Thread(() => updateThePathCoordinates(worldID, levelAreaID, leaderCoordinates));
+			updatePathCoordinates.Start();
+		}
 	
 		/*
 			update the PathCoordinates file with the leader's location in the world 
 			used by the members to locate the leader while on the run (following the leader)
 		 */
-		public void updatePathCoordinates(string worldID, string levelAreaID, Vector3 leaderCoordinates)
+		private void updateThePathCoordinates(string worldID, string levelAreaID, Vector3 leaderCoordinates)
 		{					
 			// Convert coordinates (Vector3) into floats, then strings, then separate them by commas
 			string coordinates = leaderCoordinates.X.ToString() + "#" + leaderCoordinates.Y.ToString() + "#" + leaderCoordinates.Z.ToString();
@@ -471,8 +481,7 @@ namespace PartyLeaderPro
 			randomTime = randomSeconds + randomTenthsOfSeconds;
 			Thread.Sleep(randomTime);
 		} // END OF pauseForABit(int minValue, int maxValue)
-	
-	
+		
     }
 	
 }

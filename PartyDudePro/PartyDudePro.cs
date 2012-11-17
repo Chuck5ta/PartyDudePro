@@ -41,8 +41,8 @@ using Zeta.Internals.SNO;
 	
 	Author: ChuckyEgg (CIGGARC Developer)
 	Support: CIGGARC team, et al, especially Tesslarc ;)
-	Date: 16th of November, 2012
-	Verion: 2.0.6
+	Date: 17th of November, 2012
+	Verion: 2.0.7
 	
  */
 namespace PartyDudePro
@@ -119,6 +119,9 @@ namespace PartyDudePro
 		// this holds the location of the config window's XAML file
 		private string partyDudeXamlFile = @"Plugins\PartyDudePro\PartyDudePro.xaml";
 		
+		// speed things up with threads
+		public delegate bool ThreadStart();
+		
 		
 
         // DO NOT EDIT BELOW THIS LINE IF YOU DO NOT KNOW WHAT YOU ARE DOING
@@ -153,7 +156,7 @@ namespace PartyDudePro
 
         public Version Version
         {
-            get { return new Version(2, 0, 6); }
+            get { return new Version(2, 0, 7); }
         }
 
         /// <summary> Executes the shutdown action. This is called when the bot is shutting down. (Not when Stop() is called) </summary>
